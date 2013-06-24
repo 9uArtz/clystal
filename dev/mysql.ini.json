@@ -1,0 +1,11 @@
+{
+    "default" : {
+        "master"  : "localhost",
+        "slave"   : "localhost",
+        "standby" : "localhost",
+        "user"    : "root",
+        "pass"    : "gree",
+        "db"      : "tig"
+    },
+    "tig_main" : {}
+}

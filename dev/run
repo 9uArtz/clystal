@@ -1,0 +1,10 @@
+#!/bin/sh
+ROOT=$(cd $(dirname $0);cd ../ && pwd)
+TEST_FILE=$(dirname $0)"/test.js"
+while true
+do
+    inotifywait -r -e modify --exclude '.*\.sw.' ${ROOT} --quiet
+    echo '----'
+    find ${ROOT}/ -type d -name "node_modules" -prune -o -type f -name '*.ts' -print | xargs tsc\
+        && node ${TEST_FILE}
+done
