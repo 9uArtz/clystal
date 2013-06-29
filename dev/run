@@ -5,6 +5,8 @@ while true
 do
     inotifywait -r -e modify --exclude '.*\.sw.' ${ROOT} --quiet
     echo '----'
-    find ${ROOT}/ -type d -name "node_modules" -prune -o -type f -name '*.ts' -print | xargs tsc\
+    rm -r ${ROOT}/compile/*
+    find ${ROOT}/ -type d -name "node_modules" -prune -o -type f -name '*.ts' -print\
+        | xargs tsc --out ${ROOT}/compile/ \
         && node ${TEST_FILE}
 done

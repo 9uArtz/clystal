@@ -1,5 +1,5 @@
 declare function require(name : string);
-var fs = require('fs');
+var fs   = require('fs');
 
 export function getContents(filename)
 {
@@ -9,3 +9,4 @@ export function getContents(filename)
     var contents = bytes[0];
     return contents;
 }
+

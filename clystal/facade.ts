@@ -1,24 +1,33 @@
-import criteria  = module('./criteria');
-import statement = module('./statement');
+import Format    = module('format');
+import Criteria  = module('criteria');
+import Statement = module('statement');
 
 // ----[ Methods ]--------------------------------------------------------------
 /**
  * get a record by primary key
  */
 export function get(
-    scheme_name : string,
-    key         : string,
-    hint        : any     = null,
-    use_master  : boolean = false
+    format    : Format,
+    callback  : (err : any, rows : any, fields : any) => any,
+    key       : any,
+    hint      : any     = null,
+    useMaster : boolean = false
 ) {
-    var criteria = criteria.create({
-        type        : criteria.Type.GET,
-        scheme_name : scheme_name,
-        params      : key,
-        hint        : hint,
-        use_master  : use_master
+    var params = {};
+    if (typeof key != 'object') {
+        params[format.getPrimaryKey()] = key;
+    } else {
+        params = key;
+    }
+    var criteria = new Criteria({
+        type      : Criteria.TYPE_GET,
+        format    : format,
+        callback  : callback,
+        params    : params,
+        hint      : hint,
+        useMaster : useMaster,
     });
-    var stmt = statement.create(criteria);
+    var stmt = new Statement(criteria);
 
     return stmt.execute();
 }

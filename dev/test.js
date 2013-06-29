@@ -1,8 +1,12 @@
 console.log('test started');
 
 try {
-    var clystal = require('../clystal').init('./mysql.ini.json');
-
+    var clystal = require('../compile/clystal')
+        .init('./clystal.ini.json');
+    var accessor = clystal.getAccessor('user');
+    accessor.get(function(err, rows, fields) {
+        console.log({err:err, rows:rows, fields:fields});
+    }, 1);
 } catch (e) {
     console.log(e);
     console.log('msg : ' + e.msg);

@@ -1,7 +1,9 @@
-export function create(msg : string, context? : {})
+export = Exception;
+class Exception
 {
-    return {
-        msg: msg,
-        context: context
+    constructor(
+        public msg     : string,
+        public context : {} = {}
+    ) {
     }
 }

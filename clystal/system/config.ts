@@ -2,11 +2,16 @@ var config = {};
 var initialized = false;
 
 export function init(input : {
-    default : {
-        host : string;
-        port : number;
-        user : string;
-        pass : string;
+    base: string;
+    mysql: {
+        default : {
+            master : string;
+            slave  : Array;
+            host   : string;
+            port   : number;
+            user   : string;
+            pass   : string;
+        };
     };
 }) {
     if (!initialized) {
@@ -15,26 +20,25 @@ export function init(input : {
     }
 }
 
-export function get(key : string);
-export function get(key : string[]);
-export function get(key : any)
+export function get(key : string)
 {
-    if (typeof(key) == 'string') {
-        return (config[key] == undefined)
-            ? null
-            : config[key];
-    } else {
-        var current = config;
-        for (var k in key) {
-            if (current[key[k]] == undefined) {
-                return null;
-            } else {
-                current = current[key[k]];
-            }
-        }
-
-        return current;
+    if (key.indexOf('.') === -1) {
+        return (config[key] != undefined)
+            ? config[key]
+            : null;
     }
+
+    var keys    = key.split(".");
+    var current = config;
+    for (var k in keys) {
+        if (current[keys[k]] == undefined) {
+            return null;
+        } else {
+            current = current[keys[k]];
+        }
+    }
+
+    return current;
 }
 
 export function getAll()

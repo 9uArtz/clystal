@@ -1,30 +1,89 @@
-export class Format
+import Exception = module('system/exception');
+
+export = Format;
+class Format
 {
     // ----[ Properties ]-------------------------------------------------------
     /**
-     * table name
+     * @var string
      */
-    table_name : string = null;
+    private tableName : string = null;
 
     /**
-     * primary key
+     * @var any
      */
-    primary_key : any = null;
+    private primaryKey : any = null;
 
     /**
-     * dns name
+     * @var string
      */
-    dsn : string = null;
+    private dsn : string = null;
 
     /**
-     * query
+     * @var object
      */
-    queries : {} = {};
+    private queries : {} = {};
+
+    // ----[ Methods ]----------------------------------------------------------
+    /**
+     * constructor
+     *
+     * @param   format
+     */
+    constructor(format : {})
+    {
+        for (var key in format) {
+            this[key] = format[key];
+        }
+    }
 
     /**
-     * get table name by criteria
+     * get table name
+     *
+     * @param   object
+     * @param   any
+     * @return  string
      */
-    getTableName() : string {
-        return this.table_name;
+    public getTableName(params : {}, hint : any) : string
+    {
+        return this.tableName;
+    }
+
+    /**
+     * get primary key
+     *
+     * @return  any
+     */
+    public getPrimaryKey() : any
+    {
+        return this.primaryKey;
+    }
+
+    /**
+     * getDSN
+     *
+     * @return  string
+     */
+    public getDSN() : string
+    {
+        return this.dsn;
+    }
+
+    /**
+     * getQuery
+     *
+     * @param   string
+     * @return  string
+     */
+    public getQuery(query : string) : string
+    {
+        if (this.queries[query] == undefined) {
+            throw new Exception(
+                'undefined query',
+                {query: query}
+            );
+        }
+
+        return this.queries[query];
     }
 }
