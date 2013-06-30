@@ -1,7 +1,7 @@
 console.log('test started');
 
 try {
-    var clystal = require('../compile/clystal')
+    var clystal = require('../clystal')
         .init('./clystal.ini.json');
     var accessor = clystal.getAccessor('user');
     accessor.get(function(err, rows, fields) {
