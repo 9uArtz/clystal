@@ -1,3 +1,4 @@
+require('../lib/extension');
 var Config   = require('./system/config');
 var File     = require('./system/file');
 var Accessor = require('./accessor');

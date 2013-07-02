@@ -15,11 +15,10 @@ var Criteria = function(params) {
         break;
     }
 }
-Criteria.prototype = {
-    TYPE_GET:       1,
-    TYPE_MGET:      2,
-    TYPE_FIND:      3,
-    TYPE_FINDFIRST: 4,
-    TYPE_EXEC:      5,
-}
+Criteria.TYPE_GET       = 1,
+Criteria.TYPE_MGET      = 2,
+Criteria.TYPE_FIND      = 3,
+Criteria.TYPE_FINDFIRST = 4,
+Criteria.TYPE_EXEC      = 5,
+
 module.exports = Criteria;

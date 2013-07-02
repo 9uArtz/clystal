@@ -9,14 +9,15 @@ var Accessor = function(schemeName) {
     this.format = new Format(format);
 
     // set facade method
-    for (var key in Facade) {
-        this[key] = function() {
+    var ref = this;
+    Facade.each(function(func, name) {
+        ref[name] = function() {
             var params = [this.format];
             for (var argKey in arguments) {
                 params.push(arguments[argKey]);
             }
-            Facade[key].apply(null, params);
-        }
-    }
+            Facade[name].apply(null, params);
+        };
+    });
 }
 module.exports = Accessor;

@@ -3,10 +3,9 @@ console.log('test started');
 try {
     var clystal = require('../clystal')
         .init('./clystal.ini.json');
-    var accessor = clystal.getAccessor('user');
-    accessor.get(function(err, rows, fields) {
-        console.log({err:err, rows:rows, fields:fields});
-    }, 1);
+    clystal.getAccessor('user').mget(function(user) {
+        console.log(user);
+    }, [{id:1, name:"john"}, {id:2, name:"takc"}]);
 } catch (e) {
     console.log(e);
     console.log('msg : ' + e.msg);
