@@ -1,11 +1,11 @@
 console.log('test started');
 
 try {
-    var clystal = require('../clystal')
-        .init('./clystal.ini.json');
+    var clystal = require('../clystal');
+    clystal.init('./clystal.ini.json');
     clystal
         .getAccessor('user')
-        .execute('insert', {name: 'jooohn', pass:'aaa'})(function(rows) {
+        .get(1)(function(rows) {
             console.log(rows)
         });
 } catch (e) {

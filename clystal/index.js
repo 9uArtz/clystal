@@ -1,20 +1,36 @@
+/**
+ * index.js
+ */
 require('../lib/extension');
+
+// ----[ Modules ]--------------------------------------------------------------
 var Config   = require('./system/config');
 var File     = require('./system/file');
 var Accessor = require('./accessor');
 
+// ----[ Fields ]---------------------------------------------------------------
 var accessors = {};
 
-exports.init = function(configPath)
+// ----[ Functions ]------------------------------------------------------------
+/**
+ * init
+ *
+ * @param   string
+ */
+function init(configPath)
 {
     var contents = File.getContents(configPath);
     var config   = JSON.parse(contents);
     Config.init(config);
-
-    return this;
 }
+exports.init = init;
 
-exports.getAccessor = function(schemeName)
+/**
+ * get accessor
+ *
+ * @param   string
+ */
+function getAccessor(schemeName)
 {
     if (accessors[schemeName] == undefined) {
         accessors[schemeName] = new Accessor(schemeName);
@@ -22,3 +38,4 @@ exports.getAccessor = function(schemeName)
 
     return accessors[schemeName];
 }
+exports.getAccessor = getAccessor;

@@ -1,24 +1,52 @@
+/**
+ * format.js
+ */
+// ----[ Modules ]--------------------------------------------------------------
 var Exception = require('../system/exception');
 
-var Format = function(format) {
-    this.tableName = null;
-    this.queries   = null;
-    this.dsn       = null;
-    for (var key in format) {
-        this[key] = format[key];
-    }
-}
-Format.prototype.getTableName = function() {
-    return this.tableName;
-}
-Format.prototype.getQuery = function(query) {
-    if (this.queries[query] == undefined) {
-        throw new Exception(
-            'undefined query',
-            {query: query}
-        );
+/**
+ * Format
+ */
+var Format = (function() {
+    /**
+     * constructor
+     *
+     * @param   object
+     */
+    function Format(format) {
+        this.tableName = null;
+        this.queries   = null;
+        this.dsn       = null;
+        for (var key in format) {
+            this[key] = format[key];
+        }
     }
 
-    return this.queries[query];
-}
+    /**
+     * get table name
+     *
+     * @return  string
+     */
+    Format.prototype.getTableName = function() {
+        return this.tableName;
+    }
+
+    /**
+     * get query
+     *
+     * @param   string
+     * @return  string
+     */
+    Format.prototype.getQuery = function(query) {
+        if (this.queries[query] == undefined) {
+            throw new Exception(
+                'undefined query',
+                {query: query}
+            );
+        }
+        return this.queries[query];
+    }
+
+    return Format;
+})();
 module.exports = Format;

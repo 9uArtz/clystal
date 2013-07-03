@@ -1,10 +1,23 @@
+/**
+ * file.js
+ */
+
+// ----[ Modules ]--------------------------------------------------------------
 var fs = require('fs');
-module.exports = {
-    getContents : function(filename) {
-        var stat = fs.statSync(filename);
-        var fd = fs.openSync(filename, "r");
-        var bytes = fs.readSync(fd, stat.size, 0, "ascii");
-        var contents = bytes[0];
-        return contents;
-    }
+
+// ----[ Functions ]------------------------------------------------------------
+/**
+ * get contents of file
+ *
+ * @param   string
+ * @return  string
+ */
+function getContents(fileName)
+{
+    var stat = fs.statSync(fileName);
+    var fd = fs.openSync(fileName, "r");
+    var bytes = fs.readSync(fd, stat.size, 0, "ascii");
+    var contents = bytes[0];
+    return contents;
 }
+exports.getContents = getContents;

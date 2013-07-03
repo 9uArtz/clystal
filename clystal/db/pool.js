@@ -1,12 +1,23 @@
+/**
+ * pool.js
+ */
+// ----[ Modules ]--------------------------------------------------------------
 var Config    = require('../system/config');
 var Exception = require('../system/exception');
 var Util      = require('../util');
 var mysql     = require('mysql');
 
+// ----[ Fields ]---------------------------------------------------------------
 var defaultSetting = {};
 var initialized    = false;
 var pool           = {}
 
+// ----[ Functions ]------------------------------------------------------------
+/**
+ * get default setting
+ *
+ * @return  object
+ */
 function getDefaultSetting()
 {
     if (!initialized) {
@@ -24,6 +35,14 @@ function getDefaultSetting()
 
     return defaultSetting;
 }
+
+/**
+ * get setting by DSN and State
+ *
+ * @param   string
+ * @param   string
+ * @return  object
+ */
 function getSettingByDsnAndState(dsn, state)
 {
     // new connection
@@ -47,14 +66,22 @@ function getSettingByDsnAndState(dsn, state)
     return setting;
 }
 
-module.exports = {
-    getConnection : function(dsn, state) {
-        var setting = getSettingByDsnAndState(dsn, state);
-        var key     = JSON.stringify(setting);
-        if (pool[key] == undefined) {
-            pool[key] = mysql.createConnection(setting);
-        }
-
-        return pool[key];
+/**
+ * get connection
+ *
+ * @access  public
+ * @param   string
+ * @param   string
+ * @return  object
+ */
+ function getConnection(dsn, state)
+{
+    var setting = getSettingByDsnAndState(dsn, state);
+    var key     = JSON.stringify(setting);
+    if (pool[key] == undefined) {
+        pool[key] = mysql.createConnection(setting);
     }
+
+    return pool[key];
 }
+exports.getConnection = getConnection;
