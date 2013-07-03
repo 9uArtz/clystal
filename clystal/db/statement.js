@@ -12,19 +12,53 @@ var Statement = function(criteria) {
 module.exports = Statement;
 
 /**
- * execute
+ * wrap callback
  *
- * @access  public
+ * @param   Function
+ * @param   int
+ * @return  Function
  */
-Statement.prototype.execute = function() {
-    var connection = this.getConnection();
-    var query      = this.prepare();
-    var params     = this.resolvePlaceHolder(query);
-    params.push(this.getCallback());
-    connection.query.apply(connection, params);
+function wrapCallback(callback, type)
+{
+    return function(err, rows, fields) {
+        if (err) {
+            throw err;
+        }
+        switch (type) {
+            case Criteria.TYPE_GET:
+            case Criteria.TYPE_FINDFIRST:
+                if (rows.length === 0) {
+                    callback(null);
+                } else {
+                    callback(rows.shift());
+                }
+                break;
+            default:
+                callback(rows);
+                break;
+        }
+    }
 }
 
 /**
+ * setup
+ *
+ * @access  public
+ * @return  Statement
+ */
+Statement.prototype.setup = function() {
+    var connection = this.getConnection();
+    var query      = this.prepare();
+    var params     = this.resolvePlaceHolder(query);
+    var ref        = this;
+
+    return function (callback) {
+        params.push(wrapCallback(callback));
+        connection.query.apply(connection, params);
+    };
+}
+
+/*/**
  * get connection
  *
  * @return  object
@@ -47,6 +81,10 @@ Statement.prototype.prepare = function() {
             return this.prepareForGet();
         case Criteria.TYPE_MGET:
             return this.prepareForMultiGet();
+        case Criteria.TYPE_FIND:
+        case Criteria.TYPE_FINDFIRST:
+        case Criteria.TYPE_EXEC:
+            return this.prepareForCommon();
         default:
             throw new Exception(
                 'undefined criteria type',
@@ -118,60 +156,19 @@ Statement.prototype.prepareForMultiGet = function() {
         .replaceAll('__KEY__', key)
         .replaceAll('__CARDINAL_KEY__', cardinalKey);
 }
-
 /**
- * get callback
+ * prepare for common type
  *
- * @return  Function
+ * @return  string
  */
-Statement.prototype.getCallback = function() {
-    switch (this.criteria.type) {
-        case Criteria.TYPE_GET:
-            return this.getCallbackForRow();
-        case Criteria.TYPE_MGET:
-            return this.getCallbackForRows();
-        default:
-            throw new Exception(
-                'undefined criteria type',
-                {type: this.criteria.type}
-            );
-    }
-}
-
-/**
- * get callback for single row
- *
- * @return  Function
- */
-Statement.prototype.getCallbackForRow = function()
-{
-    var callback = this.criteria.callback;
-    return function(err, rows, fields) {
-        if (err) {
-            throw err;
-        }
-        if (rows.length === 0) {
-            return callback(null);
-        } else {
-            return callback(rows.shift());
-        }
-    }
-}
-
-/**
- * get callback for multi rows
- *
- * @return  Function
- */
-Statement.prototype.getCallbackForRows = function()
-{
-    var callback = this.criteria.callback;
-    return function(err, rows, fields) {
-        if (err) {
-            throw err;
-        }
-        callback(rows);
-    }
+Statement.prototype.prepareForCommon = function() {
+    var tableName = this.criteria.format.getTableName(
+        this.criteria.params,
+        this.criteria.hint
+    );
+    return this.criteria.format
+        .getQuery(this.criteria.query)
+        .replaceAll('__TABLE_NAME__', tableName);
 }
 
 /**

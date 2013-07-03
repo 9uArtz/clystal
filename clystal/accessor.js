@@ -16,7 +16,7 @@ var Accessor = function(schemeName) {
             for (var argKey in arguments) {
                 params.push(arguments[argKey]);
             }
-            Facade[name].apply(null, params);
+            return Facade[name].apply(null, params);
         };
     });
 }

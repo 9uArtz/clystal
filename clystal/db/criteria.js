@@ -3,8 +3,10 @@ var Format = require('./format');
 var Criteria = function(params) {
     this.type     = params.type;
     this.format   = params.format;
-    this.callback = params.callback;
+    this.query    = params.query;
     this.params   = params.params;
+    this.offset   = params.offset;
+    this.limit    = params.limit;
     this.hint     = params.hint;
     switch (this.type) {
     case Criteria.TYPE_EXEC:
