@@ -2,6 +2,7 @@ clystal
 =======
 
 # sample.js
+```
 var Clystal = require('/path/to/clystal');
 Clystal.init('/path/to/config.json');
 Clystal
@@ -14,8 +15,10 @@ Clystal
     ).(function(rows) {
         console.log(rows);
     });
+```
 
 # config.json
+```
 {
     "base": "/path/to/format/dir",
     "mysql": {
@@ -30,8 +33,10 @@ Clystal
         "tig_main" : {}
     }
 }
+```
 
 # /path/to/format/dir/user.js
+```
 module.exports = {
     tableName: "user",
     primaryKey: "id",
@@ -41,3 +46,4 @@ module.exports = {
         find_by_name : "SELECT * FROM __TABLE_NAME__ WHERE name = :name",
     }
 }
+```
