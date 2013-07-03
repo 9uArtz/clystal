@@ -5,7 +5,7 @@ try {
     clystal.init('./clystal.ini.json');
     clystal
         .getAccessor('user')
-        .get(1)(function(rows) {
+        .find('find_by_name', {name:'jooohn'}, 1, 3)(function(rows) {
             console.log(rows)
         });
 } catch (e) {

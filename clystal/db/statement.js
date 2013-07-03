@@ -90,21 +90,42 @@ var Statement = (function() {
      * @return  string
      */
     Statement.prototype.prepare = function() {
+        var query;
         switch (this.criteria.type) {
             case Criteria.TYPE_GET:
-                return this.prepareForGet();
+                query = this.prepareForGet();
+                break;
             case Criteria.TYPE_MGET:
-                return this.prepareForMultiGet();
+                query = this.prepareForMultiGet();
+                break;
             case Criteria.TYPE_FIND:
             case Criteria.TYPE_FINDFIRST:
             case Criteria.TYPE_EXEC:
-                return this.prepareForCommon();
+                query = this.prepareForCommon();
+                break;
             default:
                 throw new Exception(
                     'undefined criteria type',
                     {type: this.criteria.type}
                 );
         }
+        var limit = null;
+        switch (this.criteria.type) {
+            case Criteria.TYPE_GET:
+            case Criteria.TYPE_FINDFIRST:
+                limit = 1;
+                break;
+            default:
+                limit = this.criteria.limit;
+        }
+        if (limit) {
+            query = query + ' LIMIT ' + limit;
+            if (this.criteria.offset) {
+                query = query + ' OFFSET ' + this.criteria.offset;
+            }
+        }
+
+        return query;
     }
 
     /**
