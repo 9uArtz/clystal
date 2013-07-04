@@ -227,14 +227,6 @@ var Statement = (function() {
                         'required key does not exist for placeholder',
                         {key: key}
                     );
-                } else if (value instanceof Array) {
-                    value.each(function(v) { values.push(v); });
-                    var length  = value.length;
-                    var replace = [];
-                    for (var i = 0; i < length; i ++) {
-                        replace.push('?');
-                    }
-                    query = query.replace(PLACEHOLDER_REGEX, replace.join(', '));
                 } else {
                     values.push(value);
                     query = query.replace(PLACEHOLDER_REGEX, '?');
@@ -250,16 +242,23 @@ var Statement = (function() {
                     );
                 }
                 var keys    = match[3].replace(/\s+/g, '').split(',');
-                var replace = [];
+                var param   = [];
                 value.each(function(v) {
-                    var r = [];
+                    var p = [];
                     keys.each(function(k) {
-                        values.push(v[k])
-                        r.push('?');
+                        if (v.hasKey(k)) {
+                            p.push(v[k])
+                        } else {
+                            throw new Exception(
+                                'required key does not exist for placeholder',
+                                {key: k}
+                            );
+                        }
                     });
-                    replace.push('(' + r.join(', ') + ')');
+                    param.push(p);
                 });
-                query = query.replace(PLACEHOLDER_REGEX, replace.join(', '));
+                values.push(param);
+                query = query.replace(PLACEHOLDER_REGEX, '?');
             }
         }
 

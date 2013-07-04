@@ -12,7 +12,7 @@ Clystal
         {name:"jooohn"},
         2,  // offset
         3,  // limit
-    ).(function(rows) {
+    )(function(rows) {
         console.log(rows);
     });
 ```
