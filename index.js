@@ -1,12 +1,12 @@
 /**
  * index.js
  */
-require('../lib/extension');
+require('./lib/extension');
 
 // ----[ Modules ]--------------------------------------------------------------
-var Config   = require('./system/config');
-var File     = require('./system/file');
-var Accessor = require('./accessor');
+var Config   = require('./class/system/config');
+var File     = require('./class/system/file');
+var Accessor = require('./class/accessor');
 
 // ----[ Fields ]---------------------------------------------------------------
 var accessors = {};
