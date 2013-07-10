@@ -37,51 +37,43 @@ function getDefaultSetting()
 }
 
 /**
- * get setting by DSN and State
+ * get connection
  *
  * @param   string
  * @param   string
  * @return  object
  */
-function getSettingByDsnAndState(dsn, state)
+function getConnection(dsn, state)
 {
     // new connection
     var dsnConfig = Config.get('mysql.' + dsn);
     if (dsnConfig == null) {
         throw new Exception('undefined dsn', {dsn: dsn});
-    } else {
-        dsnConfig = (dsnConfig[state] == undefined)
-            ? {}
-            : dsnConfig[state];
+    } else if (dsnConfig.hasKey(state)) {
+        dsnConfig.host = dsnConfig[state];
     }
 
     var setting = getDefaultSetting()[state];
-    for (var key in dsnConfig) {
-        setting[key] = dsnConfig[key];
-    }
-    if (typeof setting.host == 'object') {
+    dsnConfig.each(function(value, key) {
+        setting[key] = value;
+    });
+    if (setting.host instanceof Array) {
         setting.host = setting.host[Util.random(0, setting.host.length - 1)];
     }
 
-    return setting;
-}
-
-/**
- * get connection
- *
- * @access  public
- * @param   string
- * @param   string
- * @return  object
- */
- function getConnection(dsn, state)
-{
-    var setting = getSettingByDsnAndState(dsn, state);
-    var key     = JSON.stringify(setting);
-    if (pool[key] == undefined) {
-        pool[key] = mysql.createConnection(setting);
+    var baseSetting = {
+        host:     setting.host,
+        user:     setting.user,
+        password: setting.password,
     }
+    var key  = baseSetting.toJson();
+    var conn = pool.hasKey(key)
+        ? pool[key]
+        : pool[key] = mysql.createConnection(baseSetting);
+    conn.changeUser({database: setting.database}, function(err) {
+        if (err) throw err;
+    });
 
-    return pool[key];
+    return conn;
 }
 exports.getConnection = getConnection;

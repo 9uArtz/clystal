@@ -16,12 +16,13 @@ var accessors = {};
  * init
  *
  * @param   string
+ * @param   string
  */
-function init(configPath)
+function init(configPath, base)
 {
     var contents = File.getContents(configPath);
     var config   = JSON.parse(contents);
-    Config.init(config);
+    Config.init(config, base);
 }
 exports.init = init;
 
