@@ -11,10 +11,9 @@ var initialized = false;
  *
  * @param   object
  */
-function init(input, base)
+function init(input)
 {
     if (!initialized) {
-        input.base = base;
         config = input;
         initialized = true;
     }

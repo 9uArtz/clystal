@@ -1,39 +1,50 @@
 /**
  * accessor.js
  */
-// ----[ Methods ]--------------------------------------------------------------
-var Facade = require('./facade');
+var fs     = require('fs');
+var facade = require('./facade');
+var scheme = require('./system/scheme');
 var Format = require('./db/format');
-var Config = require('./system/config');
+
+// ----[ Methods ]--------------------------------------------------------------
 
 /**
  * Accessor
  */
 var Accessor = (function() {
-    function Accessor(schemeName) {
-        // set format
-        var path    = Config.get('base') + '/' + schemeName;
-        var format  = require(path);
-        this.format = new Format(format);
 
-        // set facade method
-        var ref = this;
-        Facade.each(function(func, name) {
-            ref[name] = function() {
-                var params = [this.format];
-                for (var argKey in arguments) {
-                    params.push(arguments[argKey]);
-                }
-                return Facade[name].apply(null, params);
-            };
-        });
+    /**
+     * Accessor
+     */
+    function Accessor(format) {
+        this.format = format;
     }
-    Facade.each(function(func, name) {
-        Accessor.prototype[name] = function() {
-            var params = [this.format];
-            arguments.each(function (value) { params.push(value); });
 
-            return Facade[name].apply(null, params);
+    /**
+     * call facade
+     *
+     * @param   string  call name
+     * @param   ...
+     * @return
+     */
+    Accessor.prototype.callFacade = function() {
+        var args = [];
+        arguments.each(function(param) {
+            args.push(param);
+        });
+        var name = args.shift();
+        args.unshift(this.format);
+        return facade[name].apply(null, args);
+    }
+
+    // set facade function
+    Object.keys(facade).each(function(name) {
+        Accessor.prototype[name] = function() {
+            var args = [name];
+            arguments.each(function(param) {
+                args.push(param);
+            });
+            return this.callFacade.apply(this, args);
         };
     });
     return Accessor;
