@@ -23,6 +23,7 @@ var Criteria = (function() {
         this.hint     = params.hint;
         switch (this.type) {
         case Criteria.TYPE_EXEC:
+        case Criteria.TYPE_CREATE_DB:
             this.useMaster = true;
             break;
         default:
@@ -35,6 +36,7 @@ var Criteria = (function() {
     Criteria.TYPE_FIND      = 3;
     Criteria.TYPE_FINDFIRST = 4;
     Criteria.TYPE_EXEC      = 5;
+    Criteria.TYPE_CREATE_DB = 6;
 
     return Criteria;
 })();

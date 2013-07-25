@@ -4,11 +4,12 @@
 require('./lib/extension');
 
 // ----[ Modules ]--------------------------------------------------------------
-var fs       = require('fs');
-var Scheme   = require('./class/system/scheme');
-var Config   = require('./class/system/config');
-var Accessor = require('./class/accessor');
-var Format   = require('./class/db/format');
+var fs        = require('fs');
+var Scheme    = require('./class/system/scheme');
+var Config    = require('./class/system/config');
+var Exception = require('./class/system/exception');
+var Accessor  = require('./class/accessor');
+var Format    = require('./class/db/format');
 
 // ----[ Functions ]------------------------------------------------------------
 /**
@@ -60,9 +61,20 @@ var Clystal = (function() {
     }
 
     /**
-     * accessor
+     * createCustomAccessor
+     *
+     * @param   void
+     * @return  object
      */
-    Clystal.prototype.accessor = Accessor;
+    Clystal.prototype.createCustomAccessor = function() {
+        var CustomAccessor = function() {
+            Accessor.apply(this, arguments);
+        };
+        CustomAccessor.prototype           = Object.create(Accessor.prototype);
+        CustomAccessor.prototype.construct = CustomAccessor;
+
+        return CustomAccessor;
+    };
 
     return Clystal;
 })();

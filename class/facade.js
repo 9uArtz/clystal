@@ -1,10 +1,18 @@
 /**
  * facade.js
  */
-// ----[ Modules ]--------------------------------------------------------------
 var Format    = require('./db/format');
 var Criteria  = require('./db/criteria');
 var Statement = require('./db/statement');
+
+module.exports = {
+    get       : get,
+    mget      : mget,
+    find      : find,
+    findFirst : findFirst,
+    execute   : execute,
+    createDB  : createDB,
+}
 
 /**
  * get by primary key
@@ -29,7 +37,6 @@ function get(format, key, hint, useMaster)
 
     return stmt.setup();
 }
-exports.get = get;
 
 /**
  * multi get by primary keys
@@ -54,7 +61,6 @@ function mget(format, keys, hint, useMaster)
 
     return stmt.setup();
 }
-exports.mget = mget;
 
 /**
  * find by params
@@ -87,7 +93,6 @@ function find(format, query, params, offset, limit, hint, useMaster)
 
     return stmt.setup();
 }
-exports.find = find;
 
 /**
  * find first by params
@@ -114,7 +119,6 @@ function findFirst(format, query, params, hint, useMaster)
 
     return stmt.setup();
 }
-exports.findFirst = findFirst;
 
 /**
  * execute by params
@@ -126,7 +130,8 @@ exports.findFirst = findFirst;
  */
 function execute(format, query, params, hint)
 {
-    if (hint === undefined) { hint = null; }
+    if (params === undefined) { params = null; }
+    if (hint   === undefined) { hint   = null; }
     var criteria = new Criteria({
         type      : Criteria.TYPE_EXEC,
         format    : format,
@@ -138,4 +143,22 @@ function execute(format, query, params, hint)
 
     return stmt.setup();
 }
-exports.execute = execute;
+
+/**
+ * create DB
+ *
+ * @param   Format
+ * @return  function
+ */
+function createDB(format, hint)
+{
+    if (hint === undefined) { hint = null; }
+    var criteria = new Criteria({
+        type   : Criteria.TYPE_CREATE_DB,
+        format : format,
+        hint   : hint,
+    });
+    var stmt = new Statement(criteria);
+
+    return stmt.setup();
+}

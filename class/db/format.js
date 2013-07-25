@@ -32,6 +32,15 @@ var Format = (function() {
     }
 
     /**
+     * get DSN
+     *
+     * @return  string
+     */
+    Format.prototype.getDSN = function() {
+        return this.dsn;
+    }
+
+    /**
      * get query
      *
      * @param   string

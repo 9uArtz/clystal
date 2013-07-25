@@ -7,9 +7,10 @@ var Pool      = require('./pool');
 var Exception = require('../system/exception');
 
 // ----[ Constants ]------------------------------------------------------------
-const QUERY_FOR_GET     = 'SELECT * FROM __TABLE_NAME__ WHERE __CONDITION__';
-const QUERY_FOR_MGET    = 'SELECT * FROM __TABLE_NAME__ WHERE (__KEY__) IN (:cardinal_key__CARDINAL_KEY__)';
-const PLACEHOLDER_REGEX = /(:\w+)(<(.*)>)?/;
+const QUERY_FOR_GET       = 'SELECT * FROM __TABLE_NAME__ WHERE __CONDITION__';
+const QUERY_FOR_MGET      = 'SELECT * FROM __TABLE_NAME__ WHERE (__KEY__) IN (:cardinal_key__CARDINAL_KEY__)';
+const QUERY_FOR_CREATE_DB = 'CREATE DATABASE IF NOT EXISTS __DB_NAME__';
+const PLACEHOLDER_REGEX   = /(?!\\)(:\w+)(<(.*)>)?/;
 
 // ----[ Functions ]------------------------------------------------------------
 /**
@@ -22,20 +23,17 @@ const PLACEHOLDER_REGEX = /(:\w+)(<(.*)>)?/;
 function wrapCallback(callback, type)
 {
     return function(err, rows, fields) {
-        if (err) {
-            throw err;
-        }
         switch (type) {
             case Criteria.TYPE_GET:
             case Criteria.TYPE_FINDFIRST:
                 if (rows.length === 0) {
-                    callback(null);
+                    callback(null, err);
                 } else {
-                    callback(rows.shift());
+                    callback(rows.shift(), err);
                 }
                 break;
             default:
-                callback(rows);
+                callback(rows, err);
                 break;
         }
     }
@@ -78,10 +76,12 @@ var Statement = (function() {
      * @return  object
      */
     Statement.prototype.getConnection = function() {
+        var dsn = this.criteria.format.getDSN(this.criteria.hint);
         var state = (this.criteria.useMaster)
             ? 'master'
             : 'slave';
-        return Pool.getConnection(this.criteria.format.dsn, state);
+        var useDB = (this.criteria.type !== Criteria.TYPE_CREATE_DB);
+        return Pool.getConnection(dsn, state, useDB);
     }
 
     /**
@@ -102,6 +102,9 @@ var Statement = (function() {
             case Criteria.TYPE_FINDFIRST:
             case Criteria.TYPE_EXEC:
                 query = this.prepareForCommon();
+                break;
+            case Criteria.TYPE_CREATE_DB:
+                query = this.prepareForCreateDB();
                 break;
             default:
                 throw new Exception(
@@ -125,7 +128,7 @@ var Statement = (function() {
             }
         }
 
-        return query;
+        return ' ' + query;
     }
 
     /**
@@ -208,6 +211,20 @@ var Statement = (function() {
     }
 
     /**
+     * prepare for create DB query
+     *
+     * @return  string
+     */
+    Statement.prototype.prepareForCreateDB = function() {
+        var dsn = this.criteria.format.getDSN(
+            this.criteria.hint
+        );
+        var database = Pool.getDSNOption(dsn).database;
+        return QUERY_FOR_CREATE_DB
+            .replaceAll('__DB_NAME__', database);
+    }
+
+    /**
      * resolve placeholder
      *
      * @return  Array
@@ -261,8 +278,8 @@ var Statement = (function() {
                 query = query.replace(PLACEHOLDER_REGEX, '?');
             }
         }
-
-        ret.push(query.replace(PLACEHOLDER_REGEX, '?'));
+        query = query.replaceAll('\\', '');
+        ret.push(query);
         ret.push(values);
 
         return ret;
