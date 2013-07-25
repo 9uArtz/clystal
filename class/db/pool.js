@@ -39,15 +39,21 @@ function getConnection(dsn, state, useDB)
     var key  = baseOption.toJson();
     var conn = pool.hasKey(key)
         ? pool[key]
-        : pool[key] = mysql.createConnection(baseOption);
+        : pool[key] = mysql.createPool(baseOption);
     var changeOption = {
         database : (useDB) ? option.database : null
     };
-    conn.changeUser(changeOption, function(err) {
-        if (err) throw err;
-    });
 
-    return conn;
+    return function(cb) {
+        conn.getConnection(function(err, connection) {
+            if (err) {
+                cb(err);
+            }
+            connection.changeUser(changeOption, function(err) {
+                cb(err, connection);
+            });
+        });
+    }
 }
 
 /**

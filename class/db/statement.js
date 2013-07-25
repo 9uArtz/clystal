@@ -27,13 +27,13 @@ function wrapCallback(callback, type)
             case Criteria.TYPE_GET:
             case Criteria.TYPE_FINDFIRST:
                 if (rows.length === 0) {
-                    callback(null, err);
+                    callback(err, rows);
                 } else {
-                    callback(rows.shift(), err);
+                    callback(err, rows.shift());
                 }
                 break;
             default:
-                callback(rows, err);
+                callback(err, rows);
                 break;
         }
     }
@@ -64,9 +64,16 @@ var Statement = (function() {
         var params     = this.resolvePlaceHolder(query);
         var type       = this.criteria.type;
 
+
         return function (callback) {
-            params.push(wrapCallback(callback, type));
-            connection.query.apply(connection, params);
+            connection(function(err, conn) {
+                if (err) {
+                    callback(err);
+                    return;
+                }
+                params.push(wrapCallback(callback, type));
+                conn.query.apply(conn, params);
+            });
         };
     }
 
