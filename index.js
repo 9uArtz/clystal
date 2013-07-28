@@ -5,8 +5,8 @@ require('./lib/extension');
 
 // ----[ Modules ]--------------------------------------------------------------
 var fs        = require('fs');
+var config    = require('./class/system/config');
 var Scheme    = require('./class/system/scheme');
-var Config    = require('./class/system/config');
 var Exception = require('./class/system/exception');
 var Accessor  = require('./class/accessor');
 var Format    = require('./class/db/format');
@@ -30,8 +30,8 @@ var Clystal = (function() {
      * @param   object
      * @return  object
      */
-    Clystal.prototype.init = function(config) {
-        Config.init(config);
+    Clystal.prototype.init = function(conf) {
+        config.init(conf);
         initialized = true;
         return clystal;
     }

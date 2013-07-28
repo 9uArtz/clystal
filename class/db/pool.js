@@ -2,7 +2,7 @@
  * pool.js
  */
 // ----[ Modules ]--------------------------------------------------------------
-var Config    = require('../system/config');
+var config    = require('../system/config');
 var Exception = require('../system/exception');
 var Util      = require('../util');
 var mysql     = require('mysql');
@@ -24,22 +24,13 @@ module.exports = {
  * @param   bool    [optional] flag to use db
  * @return  object
  */
-function getConnection(dsn, state, useDB)
+function getConnection(dsn, useDB)
 {
     var option = getDSNOption(dsn);
-    option.host = (option[state] instanceof Array)
-        ? option[state][Util.random(0, option[state].length - 1)]
-        : option[state];
-
-    var baseOption = {
-        host:     option.host,
-        user:     option.user,
-        password: option.password,
-    }
-    var key  = baseOption.toJson();
-    var conn = pool.hasKey(key)
+    var key    = option.toJson();
+    var conn   = pool.hasKey(key)
         ? pool[key]
-        : pool[key] = mysql.createPool(baseOption);
+        : pool[key] = mysql.createPool(option);
     var changeOption = {
         database : (useDB) ? option.database : null
     };
@@ -64,15 +55,5 @@ function getConnection(dsn, state, useDB)
  */
 function getDSNOption(dsn)
 {
-    var dsnOption = Config.get('mysql.' + dsn);
-    if (dsnOption === null) {
-        throw new Exception('undefined dsn', {dsn: dsn});
-    }
-
-    var ret = Config.get('mysql.default');
-    dsnOption.each(function(value, key) {
-        ret[key] = value;
-    });
-
-    return ret;
+    return config.get().dsn.mysql[dsn];
 }

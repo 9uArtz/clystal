@@ -84,11 +84,8 @@ var Statement = (function() {
      */
     Statement.prototype.getConnection = function() {
         var dsn = this.criteria.format.getDSN(this.criteria.hint);
-        var state = (this.criteria.useMaster)
-            ? 'master'
-            : 'slave';
         var useDB = (this.criteria.type !== Criteria.TYPE_CREATE_DB);
-        return Pool.getConnection(dsn, state, useDB);
+        return Pool.getConnection(dsn, useDB);
     }
 
     /**

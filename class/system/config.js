@@ -2,59 +2,8 @@
  * config.js
  */
 // ---[ Fields ]----------------------------------------------------------------
-var config = {};
-var initialized = false;
-
-// ---[ Functions ]-------------------------------------------------------------
-/**
- * init
- *
- * @param   object
- */
-function init(input)
-{
-    if (!initialized) {
-        config = input;
-        initialized = true;
-    }
+var conf = {};
+module.exports = {
+    init: function(input) { conf = input; },
+    get: function() { return conf; }
 }
-exports.init = init;
-
-/**
- * get
- *
- * @param   string
- * @return  any
- */
-function get(key)
-{
-    if (key.indexOf('.') === -1) {
-        return (config[key] != undefined)
-            ? config[key]
-            : null;
-    }
-
-    var keys    = key.split(".");
-    var current = config;
-    for (var k in keys) {
-        if (current[keys[k]] == undefined) {
-            return null;
-        } else {
-            current = current[keys[k]];
-        }
-    }
-
-    return current;
-}
-exports.get = get;
-
-/**
- * get all config
- *
- * @return  object
- */
-function getAll()
-{
-    return config;
-}
-exports.getAll = getAll;

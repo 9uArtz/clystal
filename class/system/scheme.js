@@ -3,7 +3,7 @@
  */
 // ----[ Modules ]-------------------------------------------------------------
 var Exception = require('./exception');
-var Config    = require('./config');
+var config    = require('./config');
 
 // ----[ Constants ]------------------------------------------------------------
 const EXTENSION       = '.js';
@@ -25,7 +25,7 @@ module.exports = {
 function getFormatPath(scheme)
 {
     checkScheme(scheme);
-    return Config.get('base') + '/' + scheme + EXTENSION;
+    return config.get().clystal + '/' + scheme + EXTENSION;
 }
 
 /**
@@ -36,7 +36,7 @@ function getFormatPath(scheme)
  */
 function getAccessorPath(scheme)
 {
-    return Config.get('base') + '/' + scheme + ACCESSOR_SUFFIX + EXTENSION;
+    return config.get().clystal + '/' + scheme + ACCESSOR_SUFFIX + EXTENSION;
 }
 
 /**
