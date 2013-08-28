@@ -10,7 +10,7 @@ var Exception = require('../system/exception');
 const QUERY_FOR_GET       = 'SELECT * FROM __TABLE_NAME__ WHERE __CONDITION__';
 const QUERY_FOR_MGET      = 'SELECT * FROM __TABLE_NAME__ WHERE (__KEY__) IN (:cardinal_key__CARDINAL_KEY__)';
 const QUERY_FOR_CREATE_DB = 'CREATE DATABASE IF NOT EXISTS __DB_NAME__';
-const PLACEHOLDER_REGEX   = /(?!\\)(:\w+)(<(.*)>)?/;
+const PLACEHOLDER_REGEX   = /[^\\](:\w+)(<(.*)>)?/;
 
 // ----[ Functions ]------------------------------------------------------------
 /**
@@ -26,11 +26,7 @@ function wrapCallback(callback, type)
         switch (type) {
             case Criteria.TYPE_GET:
             case Criteria.TYPE_FINDFIRST:
-                if (rows.length === 0) {
-                    callback(err, rows);
-                } else {
-                    callback(err, rows.shift());
-                }
+                callback(err, rows.shift());
                 break;
             default:
                 callback(err, rows);
@@ -250,7 +246,7 @@ var Statement = (function() {
                     );
                 } else {
                     values.push(value);
-                    query = query.replace(PLACEHOLDER_REGEX, '?');
+                    query = query.replace(new RegExp(match[1]), '?');
                 }
             } else {
                 // multi columns list
