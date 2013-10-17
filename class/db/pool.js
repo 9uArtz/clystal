@@ -27,22 +27,15 @@ module.exports = {
 function getConnection(dsn, useDB)
 {
     var option = getDSNOption(dsn);
-    var key    = option.toJson();
-    var conn   = pool.hasKey(key)
-        ? pool[key]
-        : pool[key] = mysql.createPool(option);
-    var changeOption = {
-        database : (useDB) ? option.database : null
-    };
+    var conn   = mysql.createPool(option);
 
     return function(cb) {
         conn.getConnection(function(err, connection) {
             if (err) {
                 cb(err);
+                return;
             }
-            connection.changeUser(changeOption, function(err) {
-                cb(err, connection);
-            });
+            cb(err, connection);
         });
     }
 }

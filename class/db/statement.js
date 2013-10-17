@@ -26,7 +26,11 @@ function wrapCallback(callback, type)
         switch (type) {
             case Criteria.TYPE_GET:
             case Criteria.TYPE_FINDFIRST:
-                callback(err, rows.shift());
+                if (rows.length === 0) {
+                    callback(err, rows);
+                } else {
+                    callback(err, rows.shift());
+                }
                 break;
             default:
                 callback(err, rows);
@@ -236,6 +240,7 @@ var Statement = (function() {
         var ret    = [];
         var values = [];
         while (match = PLACEHOLDER_REGEX.exec(query)) {
+            console.log(match)
             if (match[3] === undefined) {
                 var key   = match[1].substring(1);
                 var value = params[key];
@@ -246,7 +251,7 @@ var Statement = (function() {
                     );
                 } else {
                     values.push(value);
-                    query = query.replace(new RegExp(match[1]), '?');
+                    query = query.replace(PLACEHOLDER_REGEX, '?');
                 }
             } else {
                 // multi columns list
