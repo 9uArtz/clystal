@@ -10,7 +10,7 @@ var Exception = require('../system/exception');
 const QUERY_FOR_GET       = 'SELECT * FROM __TABLE_NAME__ WHERE __CONDITION__';
 const QUERY_FOR_MGET      = 'SELECT * FROM __TABLE_NAME__ WHERE (__KEY__) IN (:cardinal_key__CARDINAL_KEY__)';
 const QUERY_FOR_CREATE_DB = 'CREATE DATABASE IF NOT EXISTS __DB_NAME__';
-const PLACEHOLDER_REGEX   = /[^\\](:\w+)(<(.*)>)?/;
+const PLACEHOLDER_REGEX   = /([^\\])(:\w+)(<(.*)>)?/;
 
 // ----[ Functions ]------------------------------------------------------------
 /**
@@ -240,9 +240,8 @@ var Statement = (function() {
         var ret    = [];
         var values = [];
         while (match = PLACEHOLDER_REGEX.exec(query)) {
-            console.log(match)
-            if (match[3] === undefined) {
-                var key   = match[1].substring(1);
+            if (match[4] === undefined) {
+                var key   = match[2].substring(1);
                 var value = params[key];
                 if (value === undefined) {
                     throw new Exception(
@@ -251,11 +250,11 @@ var Statement = (function() {
                     );
                 } else {
                     values.push(value);
-                    query = query.replace(PLACEHOLDER_REGEX, '?');
+                    query = query.replace(PLACEHOLDER_REGEX, '$1?');
                 }
             } else {
                 // multi columns list
-                var key     = match[1].substring(1);
+                var key     = match[2].substring(1);
                 var value   = params[key];
                 if (value === undefined) {
                     throw new Exception(
@@ -263,7 +262,7 @@ var Statement = (function() {
                         {key: key}
                     );
                 }
-                var keys    = match[3].replace(/\s+/g, '').split(',');
+                var keys    = match[4].replace(/\s+/g, '').split(',');
                 var param   = [];
                 value.each(function(v) {
                     var p = [];
@@ -280,7 +279,7 @@ var Statement = (function() {
                     param.push(p);
                 });
                 values.push(param);
-                query = query.replace(PLACEHOLDER_REGEX, '?');
+                query = query.replace(PLACEHOLDER_REGEX, '$1?');
             }
         }
         query = query.replaceAll('\\', '');
